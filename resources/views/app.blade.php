@@ -1,34 +1,63 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}"  @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- Inline script to detect system dark mode preference and apply it immediately --}}
-        <script>
-            (function() {
-                const appearance = '{{ $appearance ?? "system" }}';
-
-                if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
-                    }
-                }
-            })();
-        </script>
-
-        {{-- Inline style to set the HTML background color based on our theme in app.css --}}
+        {{-- FORCE LIGHT THEME --}}
         <style>
-            html {
-                background-color: oklch(1 0 0);
+            /* Override semua dark theme */
+            html, html.dark, body {
+                background-color: #ffffff !important;
+                color: #1f2937 !important;
             }
-
-            html.dark {
-                background-color: oklch(0.145 0 0);
+            
+            /* Force light colors untuk semua elemen */
+            .bg-background, [class*="bg-background"] {
+                background-color: #ffffff !important;
+            }
+            
+            .text-foreground, [class*="text-foreground"] {
+                color: #1f2937 !important;
+            }
+            
+            .border-border, [class*="border-border"] {
+                border-color: #e5e7eb !important;
+            }
+            
+            .bg-muted, [class*="bg-muted"] {
+                background-color: #f9fafb !important;
+            }
+            
+            .text-muted-foreground, [class*="text-muted-foreground"] {
+                color: #6b7280 !important;
+            }
+            
+            /* Sidebar tetap putih */
+            aside {
+                background-color: #ffffff !important;
+                border-color: #e5e7eb !important;
+            }
+            
+            /* Cards putih */
+            .rounded-lg {
+                background-color: #ffffff !important;
+                border-color: #e5e7eb !important;
             }
         </style>
+
+        <script>
+            // Remove any dark classes that might be added
+            document.addEventListener('DOMContentLoaded', function() {
+                document.documentElement.classList.remove('dark');
+                document.body.classList.remove('dark');
+                // Force light mode every 100ms untuk memastikan
+                setInterval(() => {
+                    document.documentElement.classList.remove('dark');
+                    document.body.classList.remove('dark');
+                }, 100);
+            });
+        </script>
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
@@ -38,6 +67,7 @@
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
         @routes
         @vite(['resources/js/app.ts', "resources/js/pages/{$page['component']}.vue"])
