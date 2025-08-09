@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('role_id')->constrained('roles')->onDelete('restrict');
+            $table->foreignId('role_id')->default(3)->constrained('roles')->onDelete('restrict'); // Default to 'user' role
             $table->string('name', 100);
             $table->string('email', 191)->unique(); // Email limit for indexing
             $table->timestamp('email_verified_at')->nullable();

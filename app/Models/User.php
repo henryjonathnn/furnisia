@@ -19,7 +19,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'role_id',
+        'role_id', // Optional - defaults to 'user' role if not specified
         'name',
         'email',
         'password',
