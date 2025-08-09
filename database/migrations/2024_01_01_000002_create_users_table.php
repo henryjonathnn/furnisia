@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->id();
             $table->foreignId('role_id')->constrained('roles')->onDelete('restrict');
-            $table->string('name', 100); // Reasonable limit
+            $table->string('name', 100);
             $table->string('email', 191)->unique(); // Email limit for indexing
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
