@@ -166,69 +166,69 @@ const submit = () => {
             @submit="submit"
         >
             <template #fields>
-                <!-- Name Field -->
+            <!-- Name Field -->
                 <AuthInputField
-                    id="name"
+                        id="name" 
                     label="Nama Lengkap"
-                    type="text"
+                        type="text" 
                     icon-type="user"
                     placeholder="Masukkan nama lengkap"
                     v-model="form.name"
                     :error="form.errors.name"
                     :required="true"
                     :autofocus="true"
-                    :tabindex="1"
-                    autocomplete="name"
+                        :tabindex="1" 
+                        autocomplete="name" 
                 />
 
-                <!-- Email Field -->
+            <!-- Email Field -->
                 <AuthInputField
-                    id="email"
+                        id="email" 
                     label="Alamat Email"
-                    type="email"
+                        type="email" 
                     icon-type="email"
                     placeholder="nama@email.com"
                     v-model="form.email"
                     :error="form.errors.email"
                     :required="true"
-                    :tabindex="2"
-                    autocomplete="email"
+                        :tabindex="2" 
+                        autocomplete="email" 
                     :validation="emailValidation"
                 />
 
-                <!-- Password Field -->
+            <!-- Password Field -->
                 <AuthInputField
-                    id="password"
+                        id="password"
                     label="Password"
-                    type="password"
+                        type="password"
                     icon-type="password"
                     placeholder="Minimal 8 karakter"
                     v-model="form.password"
                     :error="form.errors.password"
                     :required="true"
-                    :tabindex="3"
-                    autocomplete="new-password"
+                        :tabindex="3"
+                        autocomplete="new-password"
                     :validation="passwordValidation"
                 />
 
-                <!-- Password Confirmation Field -->
+            <!-- Password Confirmation Field -->
                 <AuthInputField
-                    id="password_confirmation"
+                        id="password_confirmation"
                     label="Konfirmasi Password"
-                    type="password"
+                        type="password"
                     icon-type="shield"
                     placeholder="Ulangi password"
                     v-model="form.password_confirmation"
                     :error="form.errors.password_confirmation"
                     :required="true"
-                    :tabindex="4"
-                    autocomplete="new-password"
+                        :tabindex="4"
+                        autocomplete="new-password"
                     :validation="passwordConfirmValidation"
                 />
             </template>
 
             <template #footer>
-                <!-- Login Link -->
+            <!-- Login Link -->
                 <AuthLinkSection
                     text="Sudah punya akun?"
                     link-text="Masuk di Sini"

@@ -17,9 +17,15 @@ Route::middleware(['auth', 'verified', 'check.user.active'])->prefix('admin')->n
     Route::get('users/{user}/details', [App\Http\Controllers\Admin\UserController::class, 'getUserDetails'])->name('users.details');
     Route::resource('users', App\Http\Controllers\Admin\UserController::class);
     
+    // Product Management
+    Route::get('products/{product}/details', [App\Http\Controllers\Admin\ProductController::class, 'details'])->name('products.details');
+    Route::post('products/{product}/update-stock', [App\Http\Controllers\Admin\ProductController::class, 'updateStock'])->name('products.update-stock');
+    Route::post('products/{id}/restore', [App\Http\Controllers\Admin\ProductController::class, 'restore'])->name('products.restore');
+    Route::delete('products/{id}/force-delete', [App\Http\Controllers\Admin\ProductController::class, 'forceDelete'])->name('products.force-delete');
+    Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
+    
     // Add other admin routes here
     // Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
-    // Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
     // Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
 });
 

@@ -17,7 +17,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,       // 1. Roles first (admin, staff, user)
             UserSeeder::class,       // 2. Users (need roles to exist)
             CategorySeeder::class,   // 3. Categories for products
-            WalletSeeder::class,     // 4. Treasury wallet
+            ProductSeeder::class,    // 4. Sample products
+            WalletSeeder::class,     // 5. Treasury wallet
         ]);
         
         $this->command->info('🎉 Seeding completed! Login credentials:');

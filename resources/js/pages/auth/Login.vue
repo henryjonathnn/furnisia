@@ -42,46 +42,46 @@ const submit = () => {
             @submit="submit"
         >
             <template #fields>
-                <!-- Email Field -->
+            <!-- Email Field -->
                 <AuthInputField
-                    id="email"
+                        id="email"
                     label="Alamat Email"
-                    type="email"
+                        type="email"
                     icon-type="email"
                     placeholder="nama@email.com"
                     v-model="form.email"
                     :error="form.errors.email"
                     :required="true"
                     :autofocus="true"
-                    :tabindex="1"
-                    autocomplete="email"
+                        :tabindex="1"
+                        autocomplete="email"
                 />
 
-                <!-- Password Field -->
+            <!-- Password Field -->
                 <AuthInputField
-                    id="password"
+                        id="password"
                     label="Password"
-                    type="password"
+                        type="password"
                     icon-type="password"
                     placeholder="Masukkan password"
                     v-model="form.password"
                     :error="form.errors.password"
                     :required="true"
-                    :tabindex="2"
-                    autocomplete="current-password"
+                        :tabindex="2"
+                        autocomplete="current-password"
                     :show-forgot-password="canResetPassword"
                     :forgot-password-link="route('password.request')"
                 />
 
-                <!-- Remember Me -->
+            <!-- Remember Me -->
                 <RememberMeCheckbox
-                    v-model="form.remember"
+                    v-model="form.remember" 
                     :tabindex="3"
                 />
             </template>
 
             <template #footer>
-                <!-- Register Link -->
+            <!-- Register Link -->
                 <AuthLinkSection
                     text="Belum punya akun?"
                     link-text="Daftar Sekarang"
