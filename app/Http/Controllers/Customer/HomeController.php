@@ -12,24 +12,6 @@ class HomeController extends Controller
 {
     public function index()
     {
-        // Get featured products (latest 8 products)
-        $featuredProducts = Product::with('category')
-            ->where('is_active', true)
-            ->latest()
-            ->take(8)
-            ->get()
-            ->map(function ($product) {
-                return [
-                    'id' => $product->id,
-                    'name' => $product->name,
-                    'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
-                    'image' => $product->image_path,
-                    'category' => $product->category?->name,
-                    'in_stock' => $product->stock > 0,
-                    'stock' => $product->stock
-                ];
-            });
-
         // Get popular categories (categories with most products)
         $categories = Category::with('products')
             ->where('is_active', true)
@@ -47,29 +29,50 @@ class HomeController extends Controller
             ->take(6)
             ->values();
 
-        // Get bestseller products (if we had sales data)
+        // Get bestseller products (8 products, sorted by highest sold)
         $bestSellers = Product::with('category')
             ->where('is_active', true)
-            ->where('stock', '>', 0)
-            ->inRandomOrder() // Temporary random until we have real sales data
-            ->take(4)
+            ->orderBy('sold', 'desc') // Sort by most sold first
+            ->take(8)
             ->get()
             ->map(function ($product) {
                 return [
                     'id' => $product->id,
                     'name' => $product->name,
-                    'price' => 'Rp ' . number_format($product->price, 0, ',', '.'),
+                    'price' => 'Rp ' . number_format((float) $product->price, 0, ',', '.'),
                     'image' => $product->image_path,
                     'category' => $product->category?->name,
-                    'rating' => 4.5 + (rand(1, 10) / 10), // Dummy rating
-                    'sold' => rand(50, 200) // Dummy sold count
+                    'stock' => $product->stock,
+                    'stock_status' => $this->getStockStatus($product->stock),
+                    'slug' => \Str::slug($product->name),
+                    'sold' => $product->sold
+                ];
+            });
+
+        // Get limited stock products (8 products, sorted by lowest stock)
+        $limitedProducts = Product::with('category')
+            ->where('is_active', true)
+            ->where('stock', '>', 0) // Only products with stock
+            ->orderBy('stock', 'asc') // Lowest stock first
+            ->take(8)
+            ->get()
+            ->map(function ($product) {
+                return [
+                    'id' => $product->id,
+                    'name' => $product->name,
+                    'price' => 'Rp ' . number_format((float) $product->price, 0, ',', '.'),
+                    'image' => $product->image_path,
+                    'category' => $product->category?->name,
+                    'stock' => $product->stock,
+                    'stock_status' => $this->getStockStatus($product->stock),
+                    'slug' => \Str::slug($product->name)
                 ];
             });
 
         return Inertia::render('Customer/Home', [
-            'featuredProducts' => $featuredProducts,
             'categories' => $categories,
             'bestSellers' => $bestSellers,
+            'limitedProducts' => $limitedProducts,
             'stats' => [
                 'total_products' => Product::where('is_active', true)->count(),
                 'total_categories' => Category::where('is_active', true)->count(),
@@ -77,5 +80,31 @@ class HomeController extends Controller
                 'years_experience' => 5 // Dummy data
             ]
         ]);
+    }
+
+    /**
+     * Get stock status based on stock amount
+     */
+    private function getStockStatus($stock)
+    {
+        if ($stock == 0) {
+            return [
+                'label' => 'Habis',
+                'color' => 'red',
+                'badge_class' => 'bg-red-500/20 text-red-600 border-red-500/30'
+            ];
+        } elseif ($stock <= 10) {
+            return [
+                'label' => 'Hampir Habis',
+                'color' => 'yellow',
+                'badge_class' => 'bg-yellow-500/20 text-yellow-600 border-yellow-500/30'
+            ];
+        } else {
+            return [
+                'label' => 'Tersedia',
+                'color' => 'green',
+                'badge_class' => 'bg-green-500/20 text-green-600 border-green-500/30'
+            ];
+        }
     }
 }

@@ -56,6 +56,9 @@
                 class="block w-full pl-4 pr-12 py-3 text-sm border border-gray-300 rounded-xl bg-gray-50 placeholder:text-gray-500 focus:outline-none focus:ring-1 focus:ring-gray-300 focus:border-gray-400 transition-all hover:shadow-md"
                 v-model="searchQuery"
                 @keyup.enter="handleSearch"
+                @input="handleSearchInput"
+                @focus="showSuggestions = true"
+                @blur="hideSuggestions"
               />
               <button 
                 @click="handleSearch"
@@ -63,53 +66,50 @@
               >
                 <Icon name="search" class="text-gray-400 h-5 w-5 hover:text-gray-600 transition-colors" />
               </button>
+
+              <!-- Search Suggestions -->
+              <div 
+                v-if="showSuggestions && searchSuggestions.length > 0" 
+                class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-xl shadow-lg z-50 max-h-80 overflow-y-auto"
+              >
+                <div class="p-2">
+                  <button
+                    v-for="suggestion in searchSuggestions"
+                    :key="suggestion.id"
+                    @mousedown.prevent="selectSuggestion(suggestion)"
+                    class="w-full flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg transition-colors text-left"
+                  >
+                    <div class="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                      <img 
+                        v-if="suggestion.image" 
+                        :src="`/storage/${suggestion.image}`" 
+                        :alt="suggestion.name"
+                        class="w-full h-full object-cover"
+                      />
+                      <div v-else class="w-full h-full flex items-center justify-center">
+                        <Icon name="package" class="w-6 h-6 text-gray-400" />
+                      </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h4 class="font-medium text-gray-900 truncate">{{ suggestion.name }}</h4>
+                      <p class="text-sm text-gray-500">{{ suggestion.category }} • {{ suggestion.price }}</p>
+                    </div>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- Right Side Actions -->
           <div class="flex items-center space-x-2 lg:space-x-4">
-            <!-- Categories Dropdown (Desktop) -->
-            <DropdownMenu>
-              <DropdownMenuTrigger class="hidden lg:flex items-center space-x-2 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors text-black">
-                <Icon name="grid" class="h-4 w-4" />
-                <span class="text-sm font-medium">Kategori</span>
-                <Icon name="chevron-down" class="h-4 w-4" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" class="w-48">
-                <DropdownMenuItem>
-                  <Link href="/categories/furniture" class="flex items-center w-full">
-                    <Icon name="sofa" class="mr-3 h-4 w-4" />
-                    Furniture
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/categories/kitchen" class="flex items-center w-full">
-                    <Icon name="utensils" class="mr-3 h-4 w-4" />
-                    Kitchen
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/categories/decor" class="flex items-center w-full">
-                    <Icon name="palette" class="mr-3 h-4 w-4" />
-                    Home Decor
-                  </Link>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-
             <!-- Cart -->
-            <button class="relative p-3 text-black hover:text-black hover:bg-gray-100 rounded-xl transition-colors">
+            <Link href="/cart" class="relative p-3 text-black hover:text-black hover:bg-gray-100 rounded-xl transition-colors">
               <Icon name="shopping-cart" class="h-6 w-6" />
               <span v-if="cartCount > 0" 
-                    class="absolute -top-1 -right-1 h-6 w-6 bg-black text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg">
+                    class="absolute -top-1 -right-1 h-6 w-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs font-bold shadow-lg animate-pulse">
                 {{ cartCount }}
               </span>
-            </button>
-
-            <!-- Wishlist -->
-            <button class="hidden md:block relative p-3 text-black hover:text-black hover:bg-gray-100 rounded-xl transition-colors">
-              <Icon name="heart" class="h-6 w-6" />
-            </button>
+            </Link>
 
             <!-- Auth Button -->
             <div v-if="!$page.props.auth.user">
@@ -136,15 +136,9 @@
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="w-56">
                 <DropdownMenuItem>
-                  <Link href="/orders" class="flex items-center w-full">
+                  <Link href="/my-orders" class="flex items-center w-full">
                     <Icon name="package" class="mr-3 h-4 w-4" />
                     My Orders
-                  </Link>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <Link href="/wishlist" class="flex items-center w-full">
-                    <Icon name="heart" class="mr-3 h-4 w-4" />
-                    Wishlist
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -171,33 +165,6 @@
               <Icon name="menu" class="h-6 w-6" />
             </button>
           </div>
-        </div>
-
-        <!-- Secondary Navigation (Desktop) -->
-        <div class="hidden lg:flex items-center justify-center py-3 border-t border-gray-200">
-          <nav class="flex items-center space-x-8">
-            <Link href="/" :class="isActive('/') ? 'text-black font-medium border-b-2 border-black pb-1' : 'text-gray-600 hover:text-black'">
-              Beranda
-            </Link>
-            <Link href="/products" :class="isActive('/products') ? 'text-black font-medium border-b-2 border-black pb-1' : 'text-gray-600 hover:text-black'">
-              Semua Produk
-            </Link>
-            <Link href="/categories" :class="isActive('/categories') ? 'text-black font-medium border-b-2 border-black pb-1' : 'text-gray-600 hover:text-black'">
-              Kategori
-            </Link>
-            <Link href="/deals" class="text-gray-600 hover:text-black">
-              <span class="flex items-center space-x-1">
-                <Icon name="zap" class="h-4 w-4" />
-                <span>Promo Spesial</span>
-              </span>
-            </Link>
-            <Link href="/about" :class="isActive('/about') ? 'text-black font-medium border-b-2 border-black pb-1' : 'text-gray-600 hover:text-black'">
-              Tentang
-            </Link>
-            <Link href="/contact" :class="isActive('/contact') ? 'text-black font-medium border-b-2 border-black pb-1' : 'text-gray-600 hover:text-black'">
-              Kontak
-            </Link>
-          </nav>
         </div>
 
         <!-- Mobile Navigation -->
@@ -295,7 +262,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { Link, usePage } from '@inertiajs/vue3'
 import { 
   DropdownMenu, 
@@ -310,6 +277,9 @@ import Icon from '@/components/ui/Icon.vue'
 const searchQuery = ref('')
 const showMobileMenu = ref(false)
 const cartCount = ref(0) // Will be replaced with real cart data
+const showSuggestions = ref(false)
+const searchSuggestions = ref([])
+const searchTimeout = ref(null)
 
 // Computed properties
 const userInitials = computed(() => {
@@ -329,8 +299,72 @@ const isActive = (path: string) => {
 
 const handleSearch = () => {
   if (searchQuery.value.trim()) {
-    // Implement search functionality
-    console.log('Searching for:', searchQuery.value)
+    window.location.href = `/products?search=${encodeURIComponent(searchQuery.value.trim())}`
   }
 }
+
+const handleSearchInput = async () => {
+  const query = searchQuery.value.trim()
+  
+  if (searchTimeout.value) {
+    clearTimeout(searchTimeout.value)
+  }
+  
+  if (query.length < 2) {
+    searchSuggestions.value = []
+    return
+  }
+  
+  searchTimeout.value = setTimeout(async () => {
+    try {
+      const response = await fetch(`/api/search/suggestions?q=${encodeURIComponent(query)}`)
+      if (response.ok) {
+        searchSuggestions.value = await response.json()
+      }
+    } catch (error) {
+      console.error('Search suggestions error:', error)
+    }
+  }, 300)
+}
+
+const selectSuggestion = (suggestion) => {
+  window.location.href = `/products?search=${encodeURIComponent(suggestion.name)}`
+}
+
+const hideSuggestions = () => {
+  setTimeout(() => {
+    showSuggestions.value = false
+  }, 200)
+}
+
+// Load cart count on mount
+const loadCartCount = async () => {
+  try {
+    const response = await fetch('/api/cart/count')
+    if (response.ok) {
+      const data = await response.json()
+      cartCount.value = data.count
+    }
+  } catch (error) {
+    console.error('Error loading cart count:', error)
+  }
+}
+
+// Listen for cart updates
+const handleCartUpdate = (event: CustomEvent) => {
+  cartCount.value = event.detail.count
+}
+
+onMounted(() => {
+  const user = usePage().props.auth?.user
+  if (user) {
+    loadCartCount()
+  }
+  
+  window.addEventListener('cart-updated', handleCartUpdate as EventListener)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('cart-updated', handleCartUpdate as EventListener)
+})
 </script>

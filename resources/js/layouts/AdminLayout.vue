@@ -32,6 +32,20 @@
             Dashboard
           </Link>
 
+          
+          <Link
+            href="/admin/users"
+            :class="[
+              'group flex items-center rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors',
+              isActive('/admin/users')
+                ? 'bg-primary text-primary-foreground shadow-md'
+                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
+            ]"
+          >
+            <Icon name="users" class="mr-2.5 text-sm" />
+            User Management
+          </Link>
+
           <Link
             href="/admin/orders"
             :class="[
@@ -72,37 +86,11 @@
             ]"
           >
             <Icon name="warehouse" class="mr-2.5 text-sm" />
-            Inventori
+            Kategori
             <span v-if="lowStockCount > 0" 
                   class="ml-auto bg-orange-100 text-orange-600 text-xs font-medium px-1.5 py-0.5 rounded-full">
               {{ lowStockCount }}
             </span>
-          </Link>
-
-          <Link
-            href="/admin/users"
-            :class="[
-              'group flex items-center rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors',
-              isActive('/admin/users')
-                ? 'bg-primary text-primary-foreground shadow-md'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-            ]"
-          >
-            <Icon name="users" class="mr-2.5 text-sm" />
-            User Management
-          </Link>
-
-          <Link
-            href="/admin/analytics"
-            :class="[
-              'group flex items-center rounded-md px-2.5 py-2.5 text-sm font-medium transition-colors',
-              isActive('/admin/analytics')
-                ? 'bg-primary text-primary-foreground shadow-md'
-                : 'text-muted-foreground hover:bg-accent hover:text-accent-foreground'
-            ]"
-          >
-            <Icon name="chart-line" class="mr-2.5 text-sm" />
-            Analytics
           </Link>
 
           <div class="border-t border-border my-3"></div>
@@ -201,30 +189,44 @@
               />
             </div>
 
+            <!-- Wallet Balance -->
+            <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg px-4 py-2 flex items-center space-x-2">
+              <div class="h-8 w-8 bg-green-500 rounded-full flex items-center justify-center">
+                <Icon name="wallet" class="text-white text-sm" />
+              </div>
+              <div>
+                <p class="text-xs text-green-600 font-medium">Wallet Balance</p>
+                <p class="text-sm font-bold text-green-700">{{ formatCurrency(walletBalance) }}</p>
+              </div>
+            </div>
+
             <!-- Notifications -->
             <DropdownMenu>
               <DropdownMenuTrigger>
-                <button class="relative p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors">
-                  <Icon name="bell" class="text-sm" />
+                <div class="relative p-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded-md transition-colors cursor-pointer">
+                  <Icon name="bell" class="h-5 w-5" />
                   <span v-if="notificationCount > 0" 
-                        class="absolute -top-0.5 -right-0.5 h-4 w-4 bg-red-500 rounded-full flex items-center justify-center">
-                    <span class="text-xs font-medium text-white">{{ notificationCount }}</span>
+                        class="absolute -top-1 -right-1 h-5 w-5 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">
+                    {{ notificationCount > 9 ? '9+' : notificationCount }}
                   </span>
-                </button>
+                </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" class="w-80">
-                <div class="px-3 py-2 border-b">
+                <div class="p-4 border-b border-border">
                   <h3 class="font-semibold">Notifikasi</h3>
+                  <p class="text-sm text-muted-foreground">{{ notificationCount }} notifikasi baru</p>
                 </div>
-                <div v-if="notifications.length === 0" class="px-3 py-4 text-center text-muted-foreground">
-                  Tidak ada notifikasi baru
-                </div>
-                <div v-else class="max-h-64 overflow-y-auto">
-                  <div v-for="notification in notifications" :key="notification.id" 
-                       class="px-3 py-2 hover:bg-accent border-b last:border-b-0">
-                    <p class="text-sm font-medium">{{ notification.title }}</p>
-                    <p class="text-xs text-muted-foreground">{{ notification.message }}</p>
-                    <p class="text-xs text-muted-foreground mt-1">{{ notification.time }}</p>
+                <div class="max-h-64 overflow-y-auto">
+                  <div v-for="notification in notifications" 
+                       :key="notification.id" 
+                       class="p-4 border-b border-border last:border-b-0 hover:bg-accent transition-colors cursor-pointer">
+                    <div class="flex justify-between items-start">
+                      <div>
+                        <p class="text-sm font-medium">{{ notification.title }}</p>
+                        <p class="text-xs text-muted-foreground mt-1">{{ notification.message }}</p>
+                      </div>
+                      <span class="text-xs text-muted-foreground">{{ notification.time }}</span>
+                    </div>
                   </div>
                 </div>
               </DropdownMenuContent>
@@ -265,6 +267,7 @@ import Icon from '@/components/ui/Icon.vue'
 const sidebarOpen = ref(true)
 const showMobileOverlay = ref(false)
 const searchQuery = ref('')
+const walletBalance = ref(0)
 
 // Mock data - akan diganti dengan real data
 const pendingOrdersCount = ref(23)
@@ -313,6 +316,15 @@ const pageTitle = computed(() => {
 })
 
 // Methods
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('id-ID', {
+    style: 'currency',
+    currency: 'IDR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0
+  }).format(amount || 0)
+}
+
 const toggleSidebar = () => {
   sidebarOpen.value = !sidebarOpen.value
   if (window.innerWidth < 1024) {
@@ -331,6 +343,26 @@ const handleSearch = () => {
   }
 }
 
+const loadWalletBalance = async () => {
+  try {
+    const response = await fetch('/admin/wallet/balance', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      walletBalance.value = data.balance || 0
+    }
+  } catch (error) {
+    console.error('Error loading wallet balance:', error)
+    walletBalance.value = 0
+  }
+}
+
 const handleResize = () => {
   if (window.innerWidth >= 1024) {
     sidebarOpen.value = true
@@ -340,10 +372,31 @@ const handleResize = () => {
   }
 }
 
+const fetchWalletBalance = async () => {
+  try {
+    const response = await fetch('/admin/wallet/balance', {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    })
+    
+    if (response.ok) {
+      const data = await response.json()
+      walletBalance.value = data.balance
+    }
+  } catch (error) {
+    console.error('Error fetching wallet balance:', error)
+  }
+}
+
 // Lifecycle
 onMounted(() => {
   handleResize()
   window.addEventListener('resize', handleResize)
+  loadWalletBalance() // Load wallet balance on mount
 })
 
 onUnmounted(() => {

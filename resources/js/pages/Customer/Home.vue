@@ -2,272 +2,223 @@
   <CustomerLayout>
     <Head title="Furnisia - Premium Home Furniture Store" />
 
+    <div class="min-h-screen bg-gray-50">
     <!-- Categories Section -->
-    <section class="py-24 bg-white">
+      <section class="py-12 bg-white border-b border-gray-200">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-black mb-4">Belanja Berdasarkan Kategori</h2>
-          <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-            Jelajahi koleksi furniture kami yang dirancang khusus untuk setiap ruangan di rumah Anda
-          </p>
+          <div class="text-center mb-8">
+            <h2 class="text-2xl font-bold text-gray-900 mb-2">Belanja Berdasarkan Kategori</h2>
+            <p class="text-gray-600">Temukan produk sesuai kebutuhan ruangan Anda</p>
         </div>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-          <div 
+          <!-- Categories Horizontal Scroll -->
+          <div class="flex justify-center">
+            <div class="flex overflow-x-auto gap-6 pb-4 scrollbar-hide max-w-full">
+              <Link 
             v-for="category in categories" 
             :key="category.id"
-            class="group relative overflow-hidden rounded-2xl bg-white border-2 border-gray-200 hover:border-black p-8 text-center hover:shadow-xl transition-all duration-300 hover:-translate-y-2 cursor-pointer"
+                :href="`/products?category=${category.slug}`"
+                class="flex-shrink-0 group cursor-pointer"
           >
-            <div 
-              class="h-20 w-20 rounded-2xl bg-gray-100 hover:bg-gray-200 flex items-center justify-center mx-auto mb-6 group-hover:scale-110 transition-all"
-            >
+                <div class="w-36 bg-white rounded-2xl border border-gray-200 p-6 text-center hover:shadow-lg hover:border-black transition-all duration-300 hover:scale-105">
+                  <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-2xl flex items-center justify-center group-hover:bg-black transition-colors duration-300 p-2">
               <img 
                 :src="getCategoryIcon(category.name)" 
                 :alt="category.name"
-                class="h-12 w-12 object-contain filter grayscale group-hover:grayscale-0 transition-all"
+                      class="w-full h-full object-contain filter grayscale group-hover:grayscale-0 group-hover:brightness-0 group-hover:invert transition-all duration-300"
                 loading="lazy"
               />
             </div>
-            <h3 class="font-bold text-black mb-2 group-hover:text-gray-700 transition-colors">
-              {{ category.name }}
-            </h3>
-            <p class="text-sm text-gray-600">{{ category.product_count }} produk</p>
-            
-            <div class="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-              <div class="h-8 w-8 rounded-full bg-black text-white flex items-center justify-center">
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
+                  <h3 class="font-semibold text-gray-900 text-sm mb-1 group-hover:text-black">{{ category.name }}</h3>
+                  <p class="text-xs text-gray-500 group-hover:text-gray-600">{{ category.product_count }} item</p>
+                </div>
+              </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      <!-- Best Sellers Section -->
+      <section class="py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div class="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden">
+            <!-- Section Header -->
+            <div class="bg-gradient-to-r from-orange-50 to-red-50 p-8 border-b border-gray-200">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+                <div>
+                  <h2 class="text-3xl font-bold text-gray-900 mb-2">Produk Terlaris</h2>
+                  <p class="text-gray-600">Pilihan favorit pelanggan dengan penjualan terbaik</p>
+                </div>
+                <div class="ml-auto">
+                  <span class="px-4 py-2 bg-orange-100 text-orange-700 text-sm font-semibold rounded-full">
+                    🔥 Hot Items
+                  </span>
+          </div>
           </div>
         </div>
 
-        <!-- View All Categories Button -->
-        <div class="text-center mt-12">
-          <Link href="/categories" class="inline-flex items-center px-8 py-4 bg-black text-white rounded-xl font-semibold hover:bg-gray-800 transition-all hover:shadow-lg transform hover:-translate-y-0.5">
-            <span>Lihat Semua Kategori</span>
-            <svg class="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            <!-- Products Grid -->
+            <div class="p-8">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Link
+                  v-for="(product, index) in bestSellers" 
+                  :key="product.id"
+                  :href="`/products/${product.slug}`"
+                  class="group relative bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                >
+                  <!-- Bestseller Badge -->
+                  <div class="absolute top-3 left-3 z-10">
+                    <div class="flex items-center space-x-1 px-2 py-1 bg-gradient-to-r from-orange-500 to-red-500 text-white text-xs font-bold rounded-full shadow-lg">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
             </svg>
-          </Link>
+                      <span>#{{ index + 1 }}</span>
         </div>
       </div>
-    </section>
 
-    <!-- Featured Products Section -->
-    <section class="py-24 bg-muted/30">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between mb-12">
-          <div>
-            <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-2">Produk Unggulan</h2>
-            <p class="text-muted-foreground">Pilihan terbaik yang mendefinisikan gaya hidup modern</p>
-          </div>
-          <button class="flex items-center space-x-2 text-sm text-primary hover:text-primary/80 transition-colors">
-            <span>Lihat Semua</span>
-            <Icon name="arrow-right" class="h-4 w-4" />
-          </button>
+                  <!-- Stock Badge -->
+                  <div class="absolute top-3 right-3 z-10">
+                    <span class="px-2 py-1 text-xs font-medium rounded-lg border backdrop-blur-sm" :class="product.stock_status.badge_class">
+                      {{ product.stock_status.label }}
+                    </span>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div 
-            v-for="product in featuredProducts.slice(0, 8)" 
-            :key="product.id"
-            class="group relative bg-background rounded-2xl border border-border/50 overflow-hidden hover:shadow-lg transition-all duration-300 hover:scale-[1.02]"
-          >
             <!-- Product Image -->
-            <div class="aspect-square overflow-hidden bg-muted/50 relative">
+                  <div class="aspect-square overflow-hidden bg-white relative">
               <img 
                 v-if="product.image" 
-                :src="product.image" 
+                      :src="`/storage/${product.image}`" 
                 :alt="product.name" 
                 class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div v-else class="flex h-full items-center justify-center">
-                <Icon name="package" class="h-16 w-16 text-muted-foreground/50" />
-              </div>
-              
-              <!-- Quick Actions -->
-              <div class="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                <button class="h-8 w-8 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 flex items-center justify-center hover:bg-background transition-colors">
-                  <Icon name="heart" class="h-4 w-4 text-foreground" />
-                </button>
-                <button class="h-8 w-8 rounded-lg bg-background/80 backdrop-blur-sm border border-border/50 flex items-center justify-center hover:bg-background transition-colors">
-                  <Icon name="eye" class="h-4 w-4 text-foreground" />
-                </button>
-              </div>
-              
-              <!-- Stock Badge -->
-              <div v-if="product.stock > 0" class="absolute top-3 left-3">
-                <span class="px-2 py-1 bg-green-500/20 text-green-600 text-xs font-medium rounded-lg border border-green-500/30">
-                  Tersedia
-                </span>
-              </div>
-              <div v-else class="absolute top-3 left-3">
-                <span class="px-2 py-1 bg-red-500/20 text-red-600 text-xs font-medium rounded-lg border border-red-500/30">
-                  Habis
-                </span>
+                      <Icon name="package" class="h-16 w-16 text-gray-400" />
               </div>
             </div>
 
             <!-- Product Info -->
-            <div class="p-4">
-              <h3 class="font-semibold text-foreground mb-2 line-clamp-1">{{ product.name }}</h3>
+                  <div class="p-4 bg-white">
+                    <div class="flex items-center justify-between mb-2">
+                      <span class="text-xs font-medium text-orange-600 bg-orange-100 px-2 py-1 rounded-full">
+                        {{ product.sold }} terjual
+                      </span>
+                      <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {{ product.category }}
+                      </span>
+                    </div>
+                    
+                    <h3 class="font-semibold text-gray-900 mb-2 line-clamp-1 text-sm">{{ product.name }}</h3>
+                    
               <div class="flex items-center justify-between mb-3">
-                <div class="text-lg font-bold text-foreground">{{ product.price }}</div>
-                <div class="flex items-center space-x-1">
-                  <Icon name="star" class="h-4 w-4 text-yellow-500 fill-current" />
-                  <span class="text-sm text-muted-foreground">4.8</span>
-                </div>
+                      <div class="text-lg font-bold text-gray-900">{{ product.price }}</div>
               </div>
               
-              <button 
-                :disabled="product.stock === 0"
-                class="w-full h-9 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {{ product.stock > 0 ? 'Tambah ke Keranjang' : 'Stok Habis' }}
-              </button>
+
+                  </div>
+                </Link>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Best Sellers Section -->
-    <section class="py-24 bg-background">
+      <!-- Limited Stock Section -->
+      <section class="py-16">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">Produk Terlaris</h2>
-          <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Produk paling disukai pelanggan kami dengan kualitas dan desain yang telah terbukti
-          </p>
+          <div class="bg-white rounded-3xl shadow-lg border border-gray-200 overflow-hidden">
+            <!-- Section Header -->
+            <div class="bg-gradient-to-r from-red-50 to-pink-50 p-8 border-b border-gray-200">
+              <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-gradient-to-br from-red-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <div>
+                  <h2 class="text-3xl font-bold text-gray-900 mb-2">Produk Terbatas</h2>
+                  <p class="text-gray-600">Stok terbatas! Segera dapatkan sebelum kehabisan</p>
+                </div>
+                <div class="ml-auto">
+                  <span class="px-4 py-2 bg-red-100 text-red-700 text-sm font-semibold rounded-full">
+                    ⚡ Limited Stock
+                  </span>
+                </div>
+              </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <div 
-            v-for="(product, index) in bestSellers.slice(0, 3)" 
+            <!-- Products Grid -->
+            <div class="p-8">
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <Link
+                  v-for="(product, index) in limitedProducts" 
             :key="product.id"
-            class="group relative bg-gradient-to-br from-background to-muted/50 rounded-2xl border border-border/50 overflow-hidden hover:shadow-xl transition-all duration-500 hover:scale-[1.02]"
-          >
-            <!-- Rank Badge -->
-            <div class="absolute top-4 left-4 z-10">
-              <div class="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-sm font-bold">
-                {{ index + 1 }}
+                  :href="`/products/${product.slug}`"
+                  class="group relative bg-gray-50 rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-gray-300 transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                >
+                  <!-- Limited Badge -->
+                  <div class="absolute top-3 left-3 z-10">
+                    <div class="flex items-center space-x-1 px-2 py-1 bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-bold rounded-full shadow-lg">
+                      <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z" />
+                      </svg>
+                      <span>{{ product.stock }} left</span>
               </div>
             </div>
+
+                  <!-- Stock Badge -->
+                  <div class="absolute top-3 right-3 z-10">
+                    <span class="px-2 py-1 text-xs font-medium rounded-lg border backdrop-blur-sm" :class="product.stock_status.badge_class">
+                      {{ product.stock_status.label }}
+                    </span>
+                  </div>
 
             <!-- Product Image -->
-            <div class="aspect-[4/3] overflow-hidden bg-muted/50 relative">
+                  <div class="aspect-square overflow-hidden bg-white relative">
               <img 
                 v-if="product.image" 
-                :src="product.image" 
+                      :src="`/storage/${product.image}`" 
                 :alt="product.name" 
-                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
               />
               <div v-else class="flex h-full items-center justify-center">
-                <Icon name="sofa" class="h-20 w-20 text-muted-foreground/50" />
+                      <Icon name="package" class="h-16 w-16 text-gray-400" />
               </div>
               
-              <!-- Overlay -->
-              <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                    <!-- Urgency Overlay -->
+                    <div class="absolute inset-0 bg-gradient-to-t from-red-900/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
             </div>
 
             <!-- Product Info -->
-            <div class="p-6">
+                  <div class="p-4 bg-white">
               <div class="flex items-center justify-between mb-2">
-                <span class="text-xs font-medium text-primary bg-primary/10 px-2 py-1 rounded-lg">Terlaris</span>
-                <div class="flex items-center space-x-1">
-                  <Icon name="star" class="h-4 w-4 text-yellow-500 fill-current" />
-                  <span class="text-sm font-medium text-foreground">{{ product.rating || '4.9' }}</span>
-                </div>
+                      <span class="text-xs font-medium text-red-600 bg-red-100 px-2 py-1 rounded-full">
+                        Stok: {{ product.stock }}
+                      </span>
+                      <span class="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                        {{ product.category }}
+                      </span>
               </div>
               
-              <h3 class="font-bold text-foreground mb-2 text-lg">{{ product.name }}</h3>
+                    <h3 class="font-semibold text-gray-900 mb-2 line-clamp-1 text-sm">{{ product.name }}</h3>
               
-              <div class="flex items-center justify-between mb-4">
-                <div class="text-xl font-bold text-foreground">{{ product.price }}</div>
-                <span class="text-sm text-muted-foreground">{{ product.sold || 0 }} terjual</span>
+                    <div class="flex items-center justify-between mb-3">
+                      <div class="text-lg font-bold text-gray-900">{{ product.price }}</div>
               </div>
 
-              <button class="w-full h-10 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors">
-                Tambah ke Keranjang
-              </button>
+
+          </div>
+                </Link>
             </div>
           </div>
         </div>
       </div>
     </section>
-
-    <!-- Customer Testimonials Section -->
-    <section class="py-24 bg-muted/30">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-16">
-          <h2 class="text-3xl md:text-4xl font-bold text-foreground mb-4">Apa Kata Pelanggan Kami</h2>
-            <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Pengalaman nyata dari ribuan pelanggan yang puas telah mentransformasi rumah mereka dengan Furnisia
-            </p>
-          </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <!-- Testimonial 1 -->
-          <div class="bg-background rounded-2xl border border-border/50 p-8 hover:shadow-lg transition-all duration-300">
-            <div class="flex items-center space-x-1 mb-4">
-              <Icon v-for="i in 5" :key="i" name="star" class="h-4 w-4 text-yellow-500 fill-current" />
-            </div>
-            <p class="text-muted-foreground mb-6 leading-relaxed">
-              "Kualitas furniture dari Furnisia benar-benar luar biasa! Sofa yang saya beli sangat nyaman dan desainnya perfect untuk ruang tamu modern saya. Pelayanannya juga sangat memuaskan."
-            </p>
-            <div class="flex items-center space-x-4">
-              <div class="h-12 w-12 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center">
-                <span class="text-white font-semibold">SR</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-foreground">Sarah Ramadhani</h4>
-                <p class="text-sm text-muted-foreground">Interior Designer, Jakarta</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Testimonial 2 -->
-          <div class="bg-background rounded-2xl border border-border/50 p-8 hover:shadow-lg transition-all duration-300">
-            <div class="flex items-center space-x-1 mb-4">
-              <Icon v-for="i in 5" :key="i" name="star" class="h-4 w-4 text-yellow-500 fill-current" />
-            </div>
-            <p class="text-muted-foreground mb-6 leading-relaxed">
-              "Sudah 2 tahun menggunakan produk dari Furnisia dan semuanya masih dalam kondisi prima. Material berkualitas tinggi dengan harga yang reasonable. Highly recommended!"
-            </p>
-            <div class="flex items-center space-x-4">
-              <div class="h-12 w-12 rounded-full bg-gradient-to-r from-green-500 to-blue-500 flex items-center justify-center">
-                <span class="text-white font-semibold">BP</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-foreground">Budi Prasetyo</h4>
-                <p class="text-sm text-muted-foreground">Business Owner, Surabaya</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Testimonial 3 -->
-          <div class="bg-background rounded-2xl border border-border/50 p-8 hover:shadow-lg transition-all duration-300">
-            <div class="flex items-center space-x-1 mb-4">
-              <Icon v-for="i in 5" :key="i" name="star" class="h-4 w-4 text-yellow-500 fill-current" />
-            </div>
-            <p class="text-muted-foreground mb-6 leading-relaxed">
-              "Pengalaman berbelanja di Furnisia sangat menyenangkan. Tim customer service-nya responsif, pengiriman cepat, dan produknya sesuai ekspektasi. Pasti akan order lagi!"
-            </p>
-            <div class="flex items-center space-x-4">
-              <div class="h-12 w-12 rounded-full bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
-                <span class="text-white font-semibold">AF</span>
-              </div>
-              <div>
-                <h4 class="font-semibold text-foreground">Anita Fitriani</h4>
-                <p class="text-sm text-muted-foreground">Teacher, Bandung</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    </div>
   </CustomerLayout>
 </template>
 
@@ -282,12 +233,16 @@ interface Product {
   price: string
   image?: string
   category?: string
-  in_stock: boolean
   stock: number
+  stock_status: {
+    label: string
+    color: string
+    badge_class: string
+  }
+  slug: string
 }
 
 interface BestSeller extends Product {
-  rating: number
   sold: number
 }
 
@@ -295,7 +250,7 @@ interface Category {
   id: number
   name: string
   slug: string
-  description?: string
+  description: string
   product_count: number
 }
 
@@ -307,34 +262,47 @@ interface Stats {
 }
 
 defineProps<{
-  featuredProducts: Product[]
   categories: Category[]
   bestSellers: BestSeller[]
+  limitedProducts: Product[]
   stats: Stats
 }>()
 
-// Filter categories for discover section
-const filterCategories = ['All Categories', 'Living Room', 'Kitchen', 'Bedroom', 'Bathroom', 'Outdoor']
+// Methods
+const addToCart = (product: Product) => {
+  if (product.stock === 0) return
+  
+  // TODO: Implement add to cart functionality
+  console.log('Adding to cart:', product.name)
+  // This will be implemented when we have cart functionality
+}
 
 // Generate icon path from category name
 const getCategoryIcon = (categoryName: string): string => {
-  // Convert category name to kebab-case filename
+  // Convert category name to kebab-case filename with all lowercase and hyphens
   const filename = categoryName
     .toLowerCase()
-    .replace(/\s+/g, '-') // replace spaces with hyphens
-    .replace(/[^a-z0-9-]/g, '') // remove special characters except hyphens
+    .replace(/\s+/g, '-')
+    .replace(/[^\w\-]+/g, '')
   
+  // Return path to PNG icon in public/images/category-icons/
   return `/images/category-icons/${filename}.png`
 }
-
-
 </script>
 
 <style scoped>
-.line-clamp-2 {
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.line-clamp-1 {
   overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 </style>

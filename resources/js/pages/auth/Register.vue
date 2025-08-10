@@ -150,6 +150,10 @@ const isFormValid = computed(() => {
 const submit = () => {
     form.post(route('register'), {
         onFinish: () => form.reset('password', 'password_confirmation'),
+        onSuccess: () => {
+            // Force refresh setelah register berhasil untuk update session state
+            window.location.reload();
+        }
     });
 };
 </script>

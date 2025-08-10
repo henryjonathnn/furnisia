@@ -116,17 +116,7 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new product
-     */
-    public function create()
-    {
-        $categories = Category::where('is_active', true)->get(['id', 'name']);
-        
-        return Inertia::render('Admin/Products/Create', [
-            'categories' => $categories
-        ]);
-    }
+    // create() method removed - using modal instead
 
     /**
      * Store a newly created product in storage
@@ -194,28 +184,7 @@ class ProductController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for editing the specified product
-     */
-    public function edit(Product $product)
-    {
-        $categories = Category::where('is_active', true)->get(['id', 'name']);
-        
-        return Inertia::render('Admin/Products/Edit', [
-            'product' => [
-                'id' => $product->id,
-                'name' => $product->name,
-                'description' => $product->description,
-                'price' => $product->price,
-                'stock' => $product->stock,
-                'category_id' => $product->category_id,
-                'is_active' => $product->is_active,
-                'image_path' => $product->image_path,
-                'specs' => $product->specs,
-            ],
-            'categories' => $categories
-        ]);
-    }
+    // edit() method removed - using modal instead
 
     /**
      * Update the specified product in storage

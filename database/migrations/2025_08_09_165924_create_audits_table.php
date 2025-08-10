@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('audits', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('restrict'); // Who made the change
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict'); // Who made the change
             $table->string('auditable_type'); // Model class name (e.g., App\Models\Product)
-            $table->unsignedBigInteger('auditable_id'); // ID of the model being audited
+            $table->string('auditable_id'); // ID of the model being audited (can be UUID or integer)
             $table->string('event'); // create, update, delete
             $table->json('old_values')->nullable(); // Previous values
             $table->json('new_values')->nullable(); // New values

@@ -203,6 +203,7 @@ class ProductSeeder extends Seeder
                 'description' => $productData['description'],
                 'price' => $productData['price'],
                 'stock' => $productData['stock'],
+                'sold' => rand(10, 100), // Random sold count untuk testing
                 'is_active' => true,
                 'specs' => $productData['specs']
             ]);
@@ -235,6 +236,7 @@ class ProductSeeder extends Seeder
                 'description' => $productData['description'],
                 'price' => $productData['price'],
                 'stock' => $productData['stock'],
+                'sold' => rand(1, 15), // Random sold count untuk testing
                 'is_active' => true,
                 'specs' => []
             ]);
@@ -248,6 +250,7 @@ class ProductSeeder extends Seeder
             'description' => 'Kursi gaming ergonomis dengan fitur reclining dan lumbar support.',
             'price' => 2200000,
             'stock' => 0,
+            'sold' => 25, // Sold out product tapi ada history penjualan
             'is_active' => true,
             'specs' => [
                 'Material' => 'PU Leather',

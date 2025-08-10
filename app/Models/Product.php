@@ -5,10 +5,11 @@ namespace App\Models;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 class Product extends Model
 {
-    use SoftDeletes, Auditable;
+    use SoftDeletes, Auditable, HasUuids;
 
     protected $fillable = [
         'category_id',
@@ -16,6 +17,7 @@ class Product extends Model
         'description',
         'price',
         'stock',
+        'sold',
         'image_path',
         'is_active',
         'specs',
@@ -24,6 +26,7 @@ class Product extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'stock' => 'integer',
+        'sold' => 'integer',
         'is_active' => 'boolean',
         'specs' => 'array',
         'deleted_at' => 'datetime',

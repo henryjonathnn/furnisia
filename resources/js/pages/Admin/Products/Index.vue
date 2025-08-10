@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Head, router } from '@inertiajs/vue3';
 import AdminLayout from '@/layouts/AdminLayout.vue';
-import { DataTable, SearchFilter, AdminModal, Pagination } from '@/components/admin';
+import { DataTable, SearchFilter, AdminModal, Pagination, ProductModal } from '@/components/admin';
 import { ref, computed } from 'vue';
 
 // Types
@@ -53,6 +53,8 @@ const props = defineProps<{
 const showViewModal = ref(false);
 const showDeleteModal = ref(false);
 const showStockModal = ref(false);
+const showProductModal = ref(false);
+const productModalMode = ref<'create' | 'edit'>('create');
 const selectedProduct = ref<Product | null>(null);
 const productDetails = ref<any>(null);
 const loading = ref(false);
@@ -63,7 +65,7 @@ const stockForm = ref({
     reason: ''
 });
 
-// Table configuration
+// Table configuration - simplified columns
 const columns = [
     {
         key: 'product_info',
@@ -85,10 +87,6 @@ const columns = [
     {
         key: 'status',
         label: 'Status'
-    },
-    {
-        key: 'created_at',
-        label: 'Created'
     }
 ];
 
@@ -215,9 +213,7 @@ const viewProduct = async (product: Product) => {
     }
 };
 
-const editProduct = (product: Product) => {
-    router.visit(`/admin/products/${product.id}/edit`);
-};
+// Function moved below
 
 const confirmDelete = (product: Product) => {
     selectedProduct.value = product;
@@ -276,7 +272,21 @@ const handleFiltersUpdate = (newFilters: Record<string, any>) => {
 };
 
 const createProduct = () => {
-    router.visit('/admin/products/create');
+    selectedProduct.value = null;
+    productModalMode.value = 'create';
+    showProductModal.value = true;
+};
+
+const editProduct = (product: Product) => {
+    selectedProduct.value = product;
+    productModalMode.value = 'edit';
+    showProductModal.value = true;
+};
+
+const handleProductModalSuccess = () => {
+    showProductModal.value = false;
+    selectedProduct.value = null;
+    router.reload();
 };
 </script>
 
@@ -397,7 +407,6 @@ const createProduct = () => {
                         </div>
                         <div class="min-w-0">
                             <div class="text-sm font-medium text-black truncate">{{ row.name }}</div>
-                            <div class="text-sm text-gray-500 truncate">{{ row.description }}</div>
                         </div>
                     </div>
                 </template>
@@ -437,11 +446,7 @@ const createProduct = () => {
                     </span>
                 </template>
 
-                <template #cell-created_at="{ row }">
-                    <span class="text-sm text-gray-500">
-                        {{ formatDate(row.created_at) }}
-                    </span>
-                </template>
+
             </DataTable>
 
             <!-- Pagination -->
@@ -470,31 +475,83 @@ const createProduct = () => {
                         v-if="productDetails.product.image_path" 
                         :src="`/storage/${productDetails.product.image_path}`" 
                         :alt="productDetails.product.name"
-                        class="w-24 h-24 rounded-lg object-cover"
+                        class="w-32 h-32 rounded-lg object-cover border border-gray-200"
                     />
+                    <div v-else class="w-32 h-32 rounded-lg bg-gray-100 flex items-center justify-center border border-gray-200">
+                        <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </div>
                     <div class="flex-1">
                         <h3 class="text-xl font-bold text-black">{{ productDetails.product.name }}</h3>
-                        <p class="text-gray-600 mt-1">{{ productDetails.product.description }}</p>
-                        <div class="mt-2 flex items-center space-x-4">
-                            <span class="text-lg font-semibold text-black">{{ productDetails.product.formatted_price }}</span>
-                            <span class="text-sm text-gray-500">Stock: {{ productDetails.product.stock }}</span>
+                        <p class="text-gray-600 mt-1 text-sm">{{ productDetails.product.description }}</p>
+                        <div class="mt-3 grid grid-cols-2 gap-4">
+                            <div>
+                                <span class="text-sm text-gray-500">Price</span>
+                                <p class="text-lg font-semibold text-black">{{ productDetails.product.formatted_price }}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">Stock</span>
+                                <p class="text-lg font-semibold text-black">{{ productDetails.product.stock }}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">Category</span>
+                                <p class="text-sm font-medium text-gray-700">{{ productDetails.product.category?.name || 'No Category' }}</p>
+                            </div>
+                            <div>
+                                <span class="text-sm text-gray-500">Status</span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium"
+                                    :class="productDetails.product.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'"
+                                >
+                                    {{ productDetails.product.is_active ? 'Active' : 'Inactive' }}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Stats -->
+                <!-- Additional Information -->
+                <div class="border-t border-gray-200 pt-4">
+                    <h4 class="text-lg font-semibold text-black mb-3">Additional Information</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <span class="text-sm text-gray-500">Created Date</span>
+                            <p class="text-sm font-medium text-gray-700 mt-1">{{ formatDate(productDetails.product.created_at) }}</p>
+                        </div>
+                        <div class="bg-gray-50 rounded-lg p-4">
+                            <span class="text-sm text-gray-500">Last Updated</span>
+                            <p class="text-sm font-medium text-gray-700 mt-1">{{ formatDate(productDetails.product.updated_at) }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Specifications -->
+                <div v-if="productDetails.product.specs && Object.keys(productDetails.product.specs).length > 0" class="border-t border-gray-200 pt-4">
+                    <h4 class="text-lg font-semibold text-black mb-3">Specifications</h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div v-for="(value, key) in productDetails.product.specs" :key="key" class="bg-gray-50 rounded-lg p-3">
+                            <span class="text-sm text-gray-500">{{ key }}</span>
+                            <p class="text-sm font-medium text-gray-700 mt-1">{{ value }}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sales Stats -->
+                <div class="border-t border-gray-200 pt-4">
+                    <h4 class="text-lg font-semibold text-black mb-3">Sales Statistics</h4>
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <p class="text-sm text-gray-600">Total Orders</p>
-                        <p class="text-lg font-semibold text-black">{{ productDetails.stats.total_orders }}</p>
+                        <div class="bg-blue-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-blue-600 font-medium">Total Orders</p>
+                            <p class="text-2xl font-bold text-blue-700 mt-1">{{ productDetails.stats.total_orders }}</p>
+                        </div>
+                        <div class="bg-green-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-green-600 font-medium">Total Sold</p>
+                            <p class="text-2xl font-bold text-green-700 mt-1">{{ productDetails.stats.total_sold }}</p>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <p class="text-sm text-gray-600">Total Sold</p>
-                        <p class="text-lg font-semibold text-green-600">{{ productDetails.stats.total_sold }}</p>
+                        <div class="bg-orange-50 rounded-lg p-4 text-center">
+                            <p class="text-sm text-orange-600 font-medium">In Carts</p>
+                            <p class="text-2xl font-bold text-orange-700 mt-1">{{ productDetails.stats.in_carts }}</p>
                     </div>
-                    <div class="bg-gray-50 rounded-lg p-3">
-                        <p class="text-sm text-gray-600">In Carts</p>
-                        <p class="text-lg font-semibold text-blue-600">{{ productDetails.stats.in_carts }}</p>
                     </div>
                 </div>
             </div>
@@ -532,16 +589,17 @@ const createProduct = () => {
             </div>
 
             <template #footer>
-                <div class="flex justify-end space-x-3">
+                <div class="flex justify-end space-x-3 bg-gray-50 -m-6 p-6 rounded-b-2xl">
                     <button
                         @click="showStockModal = false"
-                        class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                        class="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm"
                     >
                         Cancel
                     </button>
                     <button 
                         @click="updateStock"
-                        class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium"
+                        class="px-6 py-3 bg-black text-white rounded-lg hover:bg-gray-800 transition-colors text-sm font-medium shadow-sm"
+                        style="background-color: #000000 !important;"
                     >
                         Update Stock
                     </button>
@@ -573,21 +631,32 @@ const createProduct = () => {
             </div>
 
             <template #footer>
-                <div class="flex justify-end space-x-3">
+                <div class="flex justify-end space-x-3 bg-gray-50 -m-6 p-6 rounded-b-2xl">
                     <button
                         @click="showDeleteModal = false"
-                        class="px-4 py-2 text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors text-sm font-medium"
+                        class="px-6 py-3 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium shadow-sm"
                     >
                         Cancel
                     </button>
                     <button 
                         @click="deleteProduct"
-                        class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
+                        class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-all duration-200 text-sm font-medium shadow-lg backdrop-blur-sm"
+                        style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4) !important;"
                     >
                         Delete Product
                     </button>
                 </div>
             </template>
         </AdminModal>
+
+        <!-- Product Modal (Create/Edit) -->
+        <ProductModal
+            :show="showProductModal"
+            :mode="productModalMode"
+            :product="selectedProduct"
+            :categories="categories"
+            @close="showProductModal = false"
+            @success="handleProductModalSuccess"
+        />
     </AdminLayout>
 </template>

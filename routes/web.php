@@ -5,6 +5,25 @@ use Inertia\Inertia;
 
 Route::get('/', [App\Http\Controllers\Customer\HomeController::class, 'index'])->name('home');
 
+// Customer Product routes
+Route::get('/products', [App\Http\Controllers\Customer\ProductController::class, 'index'])->name('products.index');
+Route::get('/products/{slug}', [App\Http\Controllers\Customer\ProductController::class, 'show'])->name('products.show');
+
+// Customer Cart routes
+Route::middleware(['auth', 'verified', 'check.user.active'])->group(function () {
+    Route::get('/cart', [App\Http\Controllers\Customer\CartController::class, 'index'])->name('cart.index');
+});
+
+// Customer Order routes
+Route::middleware(['auth', 'verified', 'check.user.active'])->group(function () {
+    Route::get('/my-orders', [App\Http\Controllers\Customer\OrderController::class, 'index'])->name('orders.index');
+    Route::get('/my-orders/{id}/payment', [App\Http\Controllers\Customer\OrderController::class, 'show'])->name('orders.payment');
+    Route::get('/my-orders/{id}/invoice', [App\Http\Controllers\Customer\OrderController::class, 'downloadInvoice'])->name('orders.invoice');
+});
+
+// Search suggestions API
+Route::get('/api/search/suggestions', [App\Http\Controllers\Customer\ProductController::class, 'suggestions'])->name('search.suggestions');
+
 Route::get('dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified', 'check.user.active'])->name('dashboard');
@@ -24,8 +43,16 @@ Route::middleware(['auth', 'verified', 'check.user.active'])->prefix('admin')->n
     Route::delete('products/{id}/force-delete', [App\Http\Controllers\Admin\ProductController::class, 'forceDelete'])->name('products.force-delete');
     Route::resource('products', App\Http\Controllers\Admin\ProductController::class);
     
+    // Order Management
+    Route::get('orders/{order}/details', [App\Http\Controllers\Admin\OrderController::class, 'details'])->name('orders.details');
+    Route::put('orders/{order}/status', [App\Http\Controllers\Admin\OrderController::class, 'updateStatus'])->name('orders.update-status');
+    Route::post('orders/{order}/complete', [App\Http\Controllers\Admin\OrderController::class, 'completeOrder'])->name('orders.complete');
+    Route::resource('orders', App\Http\Controllers\Admin\OrderController::class)->only(['index', 'show']);
+    
+    // Wallet Management
+    Route::get('wallet/balance', [App\Http\Controllers\Admin\WalletController::class, 'getBalance'])->name('wallet.balance');
+    
     // Add other admin routes here
-    // Route::resource('orders', App\Http\Controllers\Admin\OrderController::class);
     // Route::resource('categories', App\Http\Controllers\Admin\CategoryController::class);
 });
 
@@ -41,6 +68,29 @@ Route::prefix('api/validation')->middleware('web')->withoutMiddleware([\Illumina
     });
     Route::post('/test', function() {
         return response()->json(['message' => 'API POST is working', 'method' => 'POST']);
+    });
+});
+
+// API routes for cart operations
+Route::prefix('api/cart')->middleware('web')->group(function () {
+    Route::get('/count', [App\Http\Controllers\Customer\CartController::class, 'getCartCount'])->name('api.cart.count');
+    
+    Route::middleware(['auth', 'verified', 'check.user.active'])->group(function () {
+        Route::post('/', [App\Http\Controllers\Customer\CartController::class, 'store'])->name('api.cart.store');
+        Route::put('/{id}', [App\Http\Controllers\Customer\CartController::class, 'update'])->name('api.cart.update');
+        Route::post('/{id}/toggle-selection', [App\Http\Controllers\Customer\CartController::class, 'toggleSelection'])->name('api.cart.toggle-selection');
+        Route::post('/toggle-select-all', [App\Http\Controllers\Customer\CartController::class, 'toggleSelectAll'])->name('api.cart.toggle-select-all');
+        Route::post('/checkout', [App\Http\Controllers\Customer\CartController::class, 'checkout'])->name('api.cart.checkout');
+        Route::delete('/{id}', [App\Http\Controllers\Customer\CartController::class, 'destroy'])->name('api.cart.destroy');
+        Route::delete('/remove-selected', [App\Http\Controllers\Customer\CartController::class, 'destroySelected'])->name('api.cart.destroy-selected');
+    });
+});
+
+// API routes for order operations
+Route::prefix('api/orders')->middleware('web')->group(function () {
+    Route::middleware(['auth', 'verified', 'check.user.active'])->group(function () {
+        Route::post('/buy-now', [App\Http\Controllers\Customer\OrderController::class, 'buyNow'])->name('api.orders.buy-now');
+        Route::post('/{id}/payment', [App\Http\Controllers\Customer\OrderController::class, 'processPayment'])->name('api.orders.payment');
     });
 });
 

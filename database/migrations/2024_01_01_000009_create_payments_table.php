@@ -12,10 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('payments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('order_id')->unique()->constrained('orders')->onDelete('restrict'); // One payment per order
-            $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
-            $table->enum('method', ['gopay', 'dana', 'shopeepay', 'ovo', 'bca']);
+            $table->uuid('id')->primary();
+            $table->uuid('order_id')->unique();
+            $table->uuid('user_id');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('restrict'); // One payment per order
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
+            $table->enum('method', ['gopay', 'dana', 'shopeepay', 'ovo', 'bca'])->nullable();
             $table->enum('status', ['pending', 'success', 'failed'])->default('pending');
             $table->timestamp('paid_at')->nullable();
             $table->json('meta')->nullable();

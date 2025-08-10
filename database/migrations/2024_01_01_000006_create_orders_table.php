@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained('users')->onDelete('restrict');
+            $table->uuid('id')->primary();
+            $table->uuid('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('restrict');
             $table->enum('status', ['pending', 'progress', 'completed', 'cancelled'])->default('pending');
             $table->decimal('total', 15, 2)->unsigned(); // No negative totals
             $table->string('nota_path', 500)->nullable();

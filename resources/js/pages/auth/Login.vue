@@ -21,6 +21,10 @@ const form = useForm({
 const submit = () => {
     form.post(route('login'), {
         onFinish: () => form.reset('password'),
+        onSuccess: () => {
+            // Force refresh setelah login berhasil untuk update session state
+            window.location.reload();
+        }
     });
 };
 </script>
