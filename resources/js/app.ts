@@ -11,15 +11,23 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
-    resolve: (name) => resolvePageComponent(`./pages/${name}.vue`, import.meta.glob<DefineComponent>('./pages/**/*.vue')),
+    resolve: (name) => resolvePageComponent(
+        `./pages/${name}.vue`, 
+        import.meta.glob<DefineComponent>('./pages/**/*.vue', { eager: false }) // Lazy loading
+    ),
     setup({ el, App, props, plugin }) {
-        createApp({ render: () => h(App, props) })
+        const app = createApp({ render: () => h(App, props) })
             .use(plugin)
-            .use(ZiggyVue)
-            .mount(el);
+            .use(ZiggyVue);
+        
+        // Performance optimizations
+        app.config.performance = true;
+        
+        app.mount(el);
     },
     progress: {
-        color: '#4B5563',
+        color: '#000000', // Match our black theme
+        showSpinner: true,
     },
 });
 

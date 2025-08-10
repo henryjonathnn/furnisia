@@ -1,11 +1,8 @@
 <script setup lang="ts">
-import InputError from '@/components/InputError.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import AuthInputField from '@/components/auth/AuthInputField.vue';
+import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
 
 interface Props {
     token: string;
@@ -31,51 +28,59 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthLayout title="Reset password" description="Please enter your new password below">
-        <Head title="Reset password" />
+    <AuthLayout title="Reset Password" description="Masukkan password baru untuk akun Furnisia Anda">
+        <Head title="Reset Password - Furnisia" />
 
-        <form @submit.prevent="submit">
-            <div class="grid gap-6">
-                <div class="grid gap-2">
-                    <Label for="email">Email</Label>
-                    <Input id="email" type="email" name="email" autocomplete="email" v-model="form.email" class="mt-1 block w-full" readonly />
-                    <InputError :message="form.errors.email" class="mt-2" />
-                </div>
+        <AuthFormWrapper
+            :processing="form.processing"
+            submit-text="Perbarui Password"
+            processing-text="Memperbarui..."
+            @submit="submit"
+        >
+            <template #fields>
+                <!-- Email Field (Read-only) -->
+                <AuthInputField
+                    id="email"
+                    label="Email"
+                    type="email"
+                    icon-type="email"
+                    placeholder=""
+                    v-model="form.email"
+                    :error="form.errors.email"
+                    :readonly="true"
+                    :tabindex="1"
+                    autocomplete="email"
+                />
 
-                <div class="grid gap-2">
-                    <Label for="password">Password</Label>
-                    <Input
-                        id="password"
-                        type="password"
-                        name="password"
-                        autocomplete="new-password"
-                        v-model="form.password"
-                        class="mt-1 block w-full"
-                        autofocus
-                        placeholder="Password"
-                    />
-                    <InputError :message="form.errors.password" />
-                </div>
+                <!-- New Password Field -->
+                <AuthInputField
+                    id="password"
+                    label="Password Baru"
+                    type="password"
+                    icon-type="password"
+                    placeholder="Minimal 8 karakter"
+                    v-model="form.password"
+                    :error="form.errors.password"
+                    :required="true"
+                    :autofocus="true"
+                    :tabindex="2"
+                    autocomplete="new-password"
+                />
 
-                <div class="grid gap-2">
-                    <Label for="password_confirmation"> Confirm Password </Label>
-                    <Input
-                        id="password_confirmation"
-                        type="password"
-                        name="password_confirmation"
-                        autocomplete="new-password"
-                        v-model="form.password_confirmation"
-                        class="mt-1 block w-full"
-                        placeholder="Confirm password"
-                    />
-                    <InputError :message="form.errors.password_confirmation" />
-                </div>
-
-                <Button type="submit" class="mt-4 w-full" :disabled="form.processing">
-                    <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                    Reset password
-                </Button>
-            </div>
-        </form>
+                <!-- Password Confirmation Field -->
+                <AuthInputField
+                    id="password_confirmation"
+                    label="Konfirmasi Password Baru"
+                    type="password"
+                    icon-type="shield"
+                    placeholder="Ulangi password baru"
+                    v-model="form.password_confirmation"
+                    :error="form.errors.password_confirmation"
+                    :required="true"
+                    :tabindex="3"
+                    autocomplete="new-password"
+                />
+            </template>
+        </AuthFormWrapper>
     </AuthLayout>
 </template>

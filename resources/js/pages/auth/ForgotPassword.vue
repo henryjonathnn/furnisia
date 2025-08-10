@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import InputError from '@/components/InputError.vue';
-import TextLink from '@/components/TextLink.vue';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import AuthInputField from '@/components/auth/AuthInputField.vue';
+import AuthFormWrapper from '@/components/auth/AuthFormWrapper.vue';
+import AuthLinkSection from '@/components/auth/AuthLinkSection.vue';
+import StatusAlert from '@/components/auth/StatusAlert.vue';
 import { Head, useForm } from '@inertiajs/vue3';
-import { LoaderCircle } from 'lucide-vue-next';
 
 defineProps<{
     status?: string;
@@ -22,33 +20,47 @@ const submit = () => {
 </script>
 
 <template>
-    <AuthLayout title="Forgot password" description="Enter your email to receive a password reset link">
-        <Head title="Forgot password" />
+    <AuthLayout title="Lupa Password" description="Masukkan email Anda untuk menerima link reset password">
+        <Head title="Lupa Password - Furnisia" />
 
-        <div v-if="status" class="mb-4 text-center text-sm font-medium text-green-600">
-            {{ status }}
-        </div>
+        <StatusAlert 
+            v-if="status" 
+            :message="status" 
+            type="success" 
+        />
 
-        <div class="space-y-6">
-            <form @submit.prevent="submit">
-                <div class="grid gap-2">
-                    <Label for="email">Email address</Label>
-                    <Input id="email" type="email" name="email" autocomplete="off" v-model="form.email" autofocus placeholder="email@example.com" />
-                    <InputError :message="form.errors.email" />
-                </div>
+        <AuthFormWrapper
+            :processing="form.processing"
+            submit-text="Kirim Link Reset Password"
+            processing-text="Mengirim..."
+            @submit="submit"
+        >
+            <template #fields>
+                <!-- Email Field -->
+                <AuthInputField
+                    id="email"
+                    label="Alamat Email"
+                    type="email"
+                    icon-type="email"
+                    placeholder="nama@email.com"
+                    v-model="form.email"
+                    :error="form.errors.email"
+                    :required="true"
+                    :autofocus="true"
+                    :tabindex="1"
+                    autocomplete="off"
+                />
+            </template>
 
-                <div class="my-6 flex items-center justify-start">
-                    <Button class="w-full" :disabled="form.processing">
-                        <LoaderCircle v-if="form.processing" class="h-4 w-4 animate-spin" />
-                        Email password reset link
-                    </Button>
-                </div>
-            </form>
-
-            <div class="space-x-1 text-center text-sm text-muted-foreground">
-                <span>Or, return to</span>
-                <TextLink :href="route('login')">log in</TextLink>
-            </div>
-        </div>
+            <template #footer>
+                <!-- Back to Login -->
+                <AuthLinkSection
+                    text="Ingat password Anda?"
+                    link-text="Kembali ke Login"
+                    :link-href="route('login')"
+                    :tabindex="2"
+                />
+            </template>
+        </AuthFormWrapper>
     </AuthLayout>
 </template>

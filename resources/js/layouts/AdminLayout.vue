@@ -89,7 +89,7 @@
             ]"
           >
             <Icon name="users" class="mr-2.5 text-sm" />
-            Pelanggan
+            User Management
           </Link>
 
           <Link

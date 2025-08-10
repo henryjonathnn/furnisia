@@ -67,7 +67,10 @@ const iconClass = computed(() => {
     'share': 'fas fa-share',
     'trending-up': 'fas fa-arrow-trend-up',
     'credit-card': 'fas fa-credit-card',
-    'truck': 'fas fa-truck'
+    'truck': 'fas fa-truck',
+    'arrow-right': 'fas fa-arrow-right',
+    'eye': 'fas fa-eye',
+    'shield-check': 'fas fa-shield-alt'
   }
 
   const iconName = iconMap[props.name] || `fas fa-${props.name}`
